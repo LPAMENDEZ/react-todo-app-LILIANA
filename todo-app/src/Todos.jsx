@@ -9,71 +9,55 @@ export default function Todos() {
   const [email, setEmail] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await axios.get(API);
-      setUsers(res.data);
-    };
-    fetchData();
+    axios.get(API).then((res) =>
+      setUsers(res.data.map((u) => ({ ...u, completed: false })))
+    );
   }, []);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!name || !email) return alert("Campos obligatorios");
 
-    if (!name.trim() || !email.trim()) {
-      alert("Todos los campos son obligatorios");
-      return;
-    }
+    const res = await axios.post(API, { name, email });
 
-    try {
-      const res = await axios.post(API, {
-        name,
-        email
-      });
+    setUsers([
+      ...users,
+      { ...res.data, id: users.length + 1, completed: false },
+    ]);
 
-    
-      const newUser = {
-        id: users.length + 1,
-        name,
-        email
-      };
+    setName("");
+    setEmail("");
+  };
 
-      setUsers([...users, newUser]);
-
-
-      setName("");
-      setEmail("");
-    } catch (err) {
-      alert("Error al crear usuario");
-    }
+  const toggleUser = (id) => {
+    setUsers(
+      users.map((u) =>
+        u.id === id ? { ...u, completed: !u.completed } : u
+      )
+    );
   };
 
   return (
     <div>
       <h2>Usuarios</h2>
 
-
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <input
-          placeholder="Nombre"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <input
-          placeholder="Correo"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <button type="submit">Crear</button>
+      <form onSubmit={handleSubmit}>
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre" />
+        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Correo" />
+        <button>Crear</button>
       </form>
 
-      {/* Listado */}
       <ul>
         {users.map((u) => (
-          <li key={u.id}>
+          <li
+            key={u.id}
+            onClick={() => toggleUser(u.id)}
+            style={{
+              cursor: "pointer",
+              textDecoration: u.completed ? "line-through" : "none",
+            }}
+          >
             <strong>{u.name}</strong> — {u.email}
           </li>
         ))}
@@ -81,6 +65,7 @@ export default function Todos() {
     </div>
   );
 }
+
 
 
 
