@@ -1,35 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Home from "./components/Home";
+import Todos from "./components/Todos";
+import Registro from "./components/Registro";
+import "./App.css";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const API = "https://jsonplaceholder.typicode.com/users";
+
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    axios.get(API).then((res) => setUsers(res.data));
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <BrowserRouter>
+      <nav style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>
+        <Link to="/">Inicio</Link>
+        <Link to="/todos">Usuarios</Link>
+        <Link to="/registro">Registro</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+
+        {/* 💥 Aquí pasamos users y setUsers */}
+        <Route
+          path="/todos"
+          element={<Todos users={users} setUsers={setUsers} />}
+        />
+
+        <Route path="/registro" element={<Registro />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
