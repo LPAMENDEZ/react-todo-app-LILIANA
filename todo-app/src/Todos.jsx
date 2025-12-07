@@ -6,15 +6,15 @@ export default function Todos() {
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const res = await axios.get(API);
         setUsers(res.data);
+      } catch (err) {
+        setError("Error al cargar datos");
       } finally {
         setLoading(false);
       }
@@ -24,15 +24,11 @@ export default function Todos() {
   }, []);
 
   if (loading) return <h2>Cargando...</h2>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div>
       <h2>Usuarios</h2>
-
-      <form>
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre" />
-        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Correo" />
-      </form>
 
       <ul>
         {users.map((u) => (
@@ -42,6 +38,8 @@ export default function Todos() {
     </div>
   );
 }
+
+
 
 
 
