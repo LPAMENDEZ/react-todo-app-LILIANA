@@ -17,7 +17,7 @@ export default function Todos() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !email) return alert("Campos obligatorios");
+    if (!name || !email) return;
 
     const res = await axios.post(API, { name, email });
 
@@ -38,6 +38,11 @@ export default function Todos() {
     );
   };
 
+  const deleteUser = async (id) => {
+    await axios.delete(`${API}/${id}`);
+    setUsers(users.filter((u) => u.id !== id));
+  };
+
   return (
     <div>
       <h2>Usuarios</h2>
@@ -50,21 +55,27 @@ export default function Todos() {
 
       <ul>
         {users.map((u) => (
-          <li
-            key={u.id}
-            onClick={() => toggleUser(u.id)}
-            style={{
-              cursor: "pointer",
-              textDecoration: u.completed ? "line-through" : "none",
-            }}
-          >
-            <strong>{u.name}</strong> — {u.email}
+          <li key={u.id}>
+            <span
+              onClick={() => toggleUser(u.id)}
+              style={{
+                cursor: "pointer",
+                textDecoration: u.completed ? "line-through" : "none",
+              }}
+            >
+              {u.name} — {u.email}
+            </span>
+
+            <button onClick={() => deleteUser(u.id)} style={{ marginLeft: "10px" }}>
+              X
+            </button>
           </li>
         ))}
       </ul>
     </div>
   );
 }
+
 
 
 
